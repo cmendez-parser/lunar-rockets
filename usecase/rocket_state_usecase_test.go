@@ -187,7 +187,7 @@ func TestRocketStateUsecase_UpdateRocketFromMessage(t *testing.T) {
 			existingRocket:      nil,
 			rocketRepoError:     nil,
 			messageRepoError:    nil,
-			expectedError:       "failed to process message: rocket not found: channel-1",
+			expectedError:       "failed to update rocket state: rocket not found: channel-1",
 			expectedRocketState: nil,
 		},
 		{
@@ -208,7 +208,7 @@ func TestRocketStateUsecase_UpdateRocketFromMessage(t *testing.T) {
 			existingRocket:      nil,
 			rocketRepoError:     errors.New("database error"),
 			messageRepoError:    nil,
-			expectedError:       "failed to process message: database error",
+			expectedError:       "failed to update rocket state: database error",
 			expectedRocketState: nil,
 		},
 		{
@@ -247,7 +247,7 @@ func TestRocketStateUsecase_UpdateRocketFromMessage(t *testing.T) {
 			existingRocket:      nil,
 			rocketRepoError:     nil,
 			messageRepoError:    nil,
-			expectedError:       "failed to process message: unknown message type: UnknownType",
+			expectedError:       "failed to update rocket state: unknown message type: UnknownType",
 			expectedRocketState: nil,
 		},
 	}

@@ -17,11 +17,11 @@ import (
 )
 
 func TestNewMessageController(t *testing.T) {
-	mockUsecase := &mocks.MockMessageEventUsecase{}
+	mockUsecase := &mocks.MockRocketMessageUsecase{}
 	controller := NewMessageController(mockUsecase)
 
 	assert.NotNil(t, controller)
-	assert.Equal(t, mockUsecase, controller.messageEventUsecase)
+	assert.Equal(t, mockUsecase, controller.rocketMessageUsecase)
 }
 
 func TestMessageController_ReceiveMessage(t *testing.T) {
@@ -29,7 +29,7 @@ func TestMessageController_ReceiveMessage(t *testing.T) {
 		name           string
 		method         string
 		body           interface{}
-		setupMock      func(*mocks.MockMessageEventUsecase)
+		setupMock      func(*mocks.MockRocketMessageUsecase)
 		expectedStatus int
 		expectedBody   string
 	}{
@@ -49,7 +49,7 @@ func TestMessageController_ReceiveMessage(t *testing.T) {
 					Mission:     "ARTEMIS",
 				},
 			},
-			setupMock: func(m *mocks.MockMessageEventUsecase) {
+			setupMock: func(m *mocks.MockRocketMessageUsecase) {
 				m.On("ProcessMessage", mock.Anything, mock.AnythingOfType("*domain.RocketMessage")).
 					Return(nil)
 			},
@@ -60,7 +60,7 @@ func TestMessageController_ReceiveMessage(t *testing.T) {
 			name:   "invalid_method",
 			method: http.MethodGet,
 			body:   nil,
-			setupMock: func(m *mocks.MockMessageEventUsecase) {
+			setupMock: func(m *mocks.MockRocketMessageUsecase) {
 				// No mock setup needed
 			},
 			expectedStatus: http.StatusMethodNotAllowed,
@@ -70,7 +70,7 @@ func TestMessageController_ReceiveMessage(t *testing.T) {
 			name:   "invalid_json",
 			method: http.MethodPost,
 			body:   "invalid json",
-			setupMock: func(m *mocks.MockMessageEventUsecase) {
+			setupMock: func(m *mocks.MockRocketMessageUsecase) {
 				// No mock setup needed
 			},
 			expectedStatus: http.StatusBadRequest,
@@ -86,7 +86,7 @@ func TestMessageController_ReceiveMessage(t *testing.T) {
 					MessageType:   domain.TypeRocketLaunched,
 				},
 			},
-			setupMock: func(m *mocks.MockMessageEventUsecase) {
+			setupMock: func(m *mocks.MockRocketMessageUsecase) {
 				// No mock setup needed
 			},
 			expectedStatus: http.StatusBadRequest,
@@ -102,7 +102,7 @@ func TestMessageController_ReceiveMessage(t *testing.T) {
 					MessageTime:   time.Now(),
 				},
 			},
-			setupMock: func(m *mocks.MockMessageEventUsecase) {
+			setupMock: func(m *mocks.MockRocketMessageUsecase) {
 				// No mock setup needed
 			},
 			expectedStatus: http.StatusBadRequest,
@@ -124,7 +124,7 @@ func TestMessageController_ReceiveMessage(t *testing.T) {
 					Mission:     "ARTEMIS",
 				},
 			},
-			setupMock: func(m *mocks.MockMessageEventUsecase) {
+			setupMock: func(m *mocks.MockRocketMessageUsecase) {
 				m.On("ProcessMessage", mock.Anything, mock.AnythingOfType("*domain.RocketMessage")).
 					Return(errors.New("database error"))
 			},
@@ -137,7 +137,7 @@ func TestMessageController_ReceiveMessage(t *testing.T) {
 		tc := tc // Capture range variable
 		t.Run(tc.name, func(t *testing.T) {
 			// Create a new mock for each test case
-			mockUsecase := &mocks.MockMessageEventUsecase{}
+			mockUsecase := &mocks.MockRocketMessageUsecase{}
 			controller := NewMessageController(mockUsecase)
 
 			// Setup mock

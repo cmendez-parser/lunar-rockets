@@ -11,16 +11,27 @@ import (
 
 // MessageController handles HTTP requests for rocket messages
 type MessageController struct {
-	messageEventUsecase usecase.MessageEventUsecase
+	rocketMessageUsecase usecase.RocketMessageUsecase
 }
 
 // NewMessageController creates a new message controller
-func NewMessageController(messageEventUsecase usecase.MessageEventUsecase) *MessageController {
+func NewMessageController(rocketMessageUsecase usecase.RocketMessageUsecase) *MessageController {
 	return &MessageController{
-		messageEventUsecase: messageEventUsecase,
+		rocketMessageUsecase: rocketMessageUsecase,
 	}
 }
 
+// @Summary Receive a message
+// @Description Process and store a new rocket message
+// @Tags messages
+// @Accept json
+// @Produce json
+// @Param message body domain.RocketMessage true "Message to be processed"
+// @Success 202 {object} map[string]string "Message accepted"
+// @Failure 400 {string} string "Invalid request"
+// @Failure 405 {string} string "Method not allowed"
+// @Failure 500 {string} string "Internal server error"
+// @Router /messages [post]
 func (c *MessageController) ReceiveMessage(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -45,7 +56,7 @@ func (c *MessageController) ReceiveMessage(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	if err := c.messageEventUsecase.ProcessMessage(r.Context(), &message); err != nil {
+	if err := c.rocketMessageUsecase.ProcessMessage(r.Context(), &message); err != nil {
 		log.Printf("Error processing message: %v", err)
 		http.Error(w, "Failed to process message", http.StatusInternalServerError)
 		return

@@ -17,6 +17,14 @@ import (
 	"lunar-rockets/usecase"
 )
 
+// @title Lunar Rockets API
+// @version 1.0
+// @description API for managing lunar rockets and their messages
+
+// @host localhost:8088
+// @BasePath /
+// @schemes http
+
 func main() {
 	cfg, err := configs.LoadConfig()
 	if err != nil {
@@ -29,20 +37,11 @@ func main() {
 	}
 	defer db.Close()
 
-	/*if _, err := db.Exec("PRAGMA journal_mode=WAL;"); err != nil {
-		db.Close()
-		log.Fatalf("Failed to set WAL mode: %v", err)
-	}
-	if _, err := db.Exec("PRAGMA busy_timeout=5000;"); err != nil {
-		db.Close()
-		log.Fatalf("Failed to set busy timeout: %v", err)
-	}*/
-
 	rocketRepo := repository.NewRocketRepository(db)
 	messageRepo := repository.NewMessageRepository(db)
 
 	rocketStateUsecase := usecase.NewRocketStateUsecase(rocketRepo, messageRepo)
-	messageProcessor := usecase.NewMessageEventUsecase(rocketRepo, messageRepo, rocketStateUsecase)
+	messageProcessor := usecase.NewRocketMessageUsecase(rocketRepo, messageRepo, rocketStateUsecase)
 	rocketUseCase := usecase.NewRocketUseCase(rocketRepo)
 
 	messageController := controller.NewMessageController(messageProcessor)

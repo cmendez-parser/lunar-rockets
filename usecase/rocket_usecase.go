@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"lunar-rockets/domain"
 )
@@ -30,12 +31,13 @@ func (u *rocketUseCase) GetRocket(ctx context.Context, channel string) (*domain.
 		return nil, domain.ErrRocketNotFound
 	}
 
+	log.Printf("Successfully retrieved rocket for channel %s", channel)
 	return rocket, nil
 }
 
 func (u *rocketUseCase) ListRockets(ctx context.Context, sortBy string, order string) ([]*domain.Rocket, error) {
 	if sortBy == "" {
-		sortBy = "launch_time"
+		sortBy = "type"
 	}
 
 	if order == "" || (order != "ASC" && order != "DESC") {
@@ -47,5 +49,6 @@ func (u *rocketUseCase) ListRockets(ctx context.Context, sortBy string, order st
 		return nil, fmt.Errorf("failed to list rockets: %w", err)
 	}
 
+	log.Printf("Successfully listed %d rockets", len(rockets))
 	return rockets, nil
 }

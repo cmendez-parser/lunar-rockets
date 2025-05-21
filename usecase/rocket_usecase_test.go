@@ -119,7 +119,7 @@ func TestRocketUseCase_ListRockets(t *testing.T) {
 			},
 			repoError:      nil,
 			expectedError:  "",
-			expectedSortBy: "launch_time",
+			expectedSortBy: "type",
 			expectedOrder:  "DESC",
 		},
 		{
@@ -169,7 +169,7 @@ func TestRocketUseCase_ListRockets(t *testing.T) {
 			rockets:        nil,
 			repoError:      errors.New("database error"),
 			expectedError:  "failed to list rockets: database error",
-			expectedSortBy: "launch_time",
+			expectedSortBy: "type",
 			expectedOrder:  "DESC",
 		},
 	}

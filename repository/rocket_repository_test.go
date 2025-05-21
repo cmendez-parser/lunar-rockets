@@ -488,7 +488,7 @@ func TestRocketRepository_GetAll(t *testing.T) {
 				if tc.sortBy != "" {
 					expectedQuery += tc.sortBy + " " + tc.order
 				} else {
-					expectedQuery += "launch_time DESC"
+					expectedQuery += "type DESC"
 				}
 
 				mock.ExpectQuery(expectedQuery).

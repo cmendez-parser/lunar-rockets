@@ -26,6 +26,16 @@ func NewRocketController(rocketUseCase usecase.RocketUseCase) *RocketController 
 	}
 }
 
+// @Summary Get a specific rocket
+// @Description Retrieve details of a specific rocket by its channel ID
+// @Tags rockets
+// @Accept json
+// @Produce json
+// @Param channel path string true "Rocket Channel ID"
+// @Success 200 {object} domain.Rocket
+// @Failure 400 {string} string "Invalid request"
+// @Failure 404 {string} string "Rocket not found"
+// @Router /rockets/{channel} [get]
 func (c *RocketController) GetRocket(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -59,14 +69,23 @@ func (c *RocketController) GetRocket(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(rocket)
 }
 
+// @Summary List all rockets
+// @Description Retrieve a list of all available rockets with optional sorting
+// @Tags rockets
+// @Accept json
+// @Produce json
+// @Param sort query string false "Sort field ('channel','type','speed','mission','status')"
+// @Param order query string false "Sort order ('asc' or 'desc')"
+// @Success 200 {array} domain.Rocket
+// @Router /rockets [get]
 func (c *RocketController) ListRockets(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	sortBy := r.URL.Query().Get("sort")
-	order := strings.ToLower(r.URL.Query().Get("order"))
+	sortBy := strings.ToLower(r.URL.Query().Get("sort"))
+	order := strings.ToUpper(r.URL.Query().Get("order"))
 
 	rockets, err := c.rocketUseCase.ListRockets(r.Context(), sortBy, order)
 	if err != nil {

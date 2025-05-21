@@ -2,7 +2,7 @@
 
 A Go microservice that consumes and processes rocket state messages and exposes rocket information through a REST API.
 
-## Architecture
+## Lite Clean Architecture
 
 This project follows clean architecture principles with clear separation of concerns:
 
@@ -20,6 +20,9 @@ This project follows clean architecture principles with clear separation of conc
 
 ## API Endpoints
 
+The API documentation is available through Swagger UI at `http://localhost:8088/swagger/index.html` when the service is running.
+
+Available endpoints:
 - `POST /messages`: Receive rocket messages via webhook
 - `GET /rockets`: List all rockets with optional sorting
 - `GET /rockets/{channel}`: Get a specific rocket by channel ID 
@@ -31,6 +34,13 @@ This project follows clean architecture principles with clear separation of conc
 
 ## Running the Service
 
+If your system is darwin_arm64:
+```bash
+# Run the service
+./lunar-rockets   
+```
+
+If your system is different than darwin_arm64:
 ```bash
 # Build the service
 go build -o lunar-rockets ./cmd

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"time"
 
 	"lunar-rockets/domain"
@@ -33,27 +34,29 @@ func (u *rocketStateUsecase) UpdateRocketFromMessage(ctx context.Context, messag
 
 	defer func() {
 		if err != nil {
+			log.Printf("Rolling back transaction for channel %s due to error: %v", message.Metadata.Channel, err)
 			_ = tx.Rollback()
 		}
 	}()
 
+	var processErr error
 	switch message.Metadata.MessageType {
 	case domain.TypeRocketLaunched:
-		err = u.handleRocketLaunched(ctx, message)
+		processErr = u.handleRocketLaunched(ctx, message)
 	case domain.TypeRocketSpeedIncreased:
-		err = u.handleRocketSpeedIncreased(ctx, message)
+		processErr = u.handleRocketSpeedIncreased(ctx, message)
 	case domain.TypeRocketSpeedDecreased:
-		err = u.handleRocketSpeedDecreased(ctx, message)
+		processErr = u.handleRocketSpeedDecreased(ctx, message)
 	case domain.TypeRocketExploded:
-		err = u.handleRocketExploded(ctx, message)
+		processErr = u.handleRocketExploded(ctx, message)
 	case domain.TypeRocketMissionChanged:
-		err = u.handleRocketMissionChanged(ctx, message)
+		processErr = u.handleRocketMissionChanged(ctx, message)
 	default:
-		err = fmt.Errorf("unknown message type: %s", message.Metadata.MessageType)
+		processErr = fmt.Errorf("unknown message type: %s", message.Metadata.MessageType)
 	}
 
-	if err != nil {
-		return fmt.Errorf("failed to process message: %w", err)
+	if processErr != nil {
+		return fmt.Errorf("failed to update rocket state: %w", processErr)
 	}
 
 	if err = u.messageRepo.MarkAsProcessed(ctx, message.Metadata.Channel, message.Metadata.MessageNumber); err != nil {
@@ -64,11 +67,11 @@ func (u *rocketStateUsecase) UpdateRocketFromMessage(ctx context.Context, messag
 		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
+	log.Printf("Successfully updated rocket state for message type %s, channel %s", message.Metadata.MessageType, message.Metadata.Channel)
 	return nil
 }
 
 func (p *rocketStateUsecase) handleRocketLaunched(ctx context.Context, message *domain.RocketMessage) error {
-
 	var launchMsg domain.RocketLaunchedMessage
 	if err := parseMessagePayload(message.Message, &launchMsg); err != nil {
 		return err
@@ -80,6 +83,7 @@ func (p *rocketStateUsecase) handleRocketLaunched(ctx context.Context, message *
 	}
 
 	if rocket != nil {
+		log.Printf("Rocket already exists for channel %s, skipping launch", message.Metadata.Channel)
 		return nil
 	}
 
@@ -94,7 +98,12 @@ func (p *rocketStateUsecase) handleRocketLaunched(ctx context.Context, message *
 		LastMessage: message.Metadata.MessageNumber,
 	}
 
-	return p.rocketRepo.Save(ctx, newRocket)
+	if err := p.rocketRepo.Save(ctx, newRocket); err != nil {
+		return err
+	}
+
+	log.Printf("Successfully launched rocket for channel %s", message.Metadata.Channel)
+	return nil
 }
 
 func (p *rocketStateUsecase) handleRocketSpeedIncreased(ctx context.Context, message *domain.RocketMessage) error {

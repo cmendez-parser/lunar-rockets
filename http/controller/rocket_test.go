@@ -138,7 +138,7 @@ func TestRocketController_ListRockets(t *testing.T) {
 			method: http.MethodGet,
 			query:  "?sort=speed&order=desc",
 			setupMock: func(m *mocks.MockRocketUseCase) {
-				m.On("ListRockets", mock.Anything, "speed", "desc").
+				m.On("ListRockets", mock.Anything, "speed", "DESC").
 					Return([]*domain.Rocket{
 						{
 							Channel:     "channel-1",
@@ -170,7 +170,7 @@ func TestRocketController_ListRockets(t *testing.T) {
 			method: http.MethodGet,
 			query:  "?sort=speed&order=desc",
 			setupMock: func(m *mocks.MockRocketUseCase) {
-				m.On("ListRockets", mock.Anything, "speed", "desc").
+				m.On("ListRockets", mock.Anything, "speed", "DESC").
 					Return(nil, errors.New("database error"))
 			},
 			expectedStatus: http.StatusInternalServerError,

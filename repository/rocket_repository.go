@@ -72,15 +72,14 @@ func (r *RocketRepository) GetByChannel(ctx context.Context, channel string) (*d
 
 func (r *RocketRepository) GetAll(ctx context.Context, sortBy string, order string) ([]*domain.Rocket, error) {
 	if sortBy == "" {
-		sortBy = "launch_time"
+		sortBy = "type"
 	}
 	if order == "" {
 		order = "DESC"
 	}
 
 	validColumns := map[string]bool{
-		"channel": true, "type": true, "speed": true, "mission": true,
-		"launch_time": true, "status": true, "last_updated": true,
+		"channel": true, "type": true, "speed": true, "mission": true, "status": true,
 	}
 
 	if !validColumns[sortBy] {

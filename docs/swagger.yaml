@@ -1,0 +1,153 @@
+basePath: /
+definitions:
+  domain.MessageMetadata:
+    properties:
+      channel:
+        type: string
+      messageNumber:
+        type: integer
+      messageTime:
+        type: string
+      messageType:
+        type: string
+    type: object
+  domain.Rocket:
+    properties:
+      channel:
+        description: Unique identifier for the rocket
+        type: string
+      explodedAt:
+        description: Time when the rocket exploded, if applicable
+        type: string
+      lastMessage:
+        description: Last message number processed
+        type: integer
+      lastUpdated:
+        description: Last time the rocket state was updated
+        type: string
+      launchTime:
+        description: Time when the rocket was launched
+        type: string
+      mission:
+        description: Current mission
+        type: string
+      reason:
+        description: Reason for explosion, if applicable
+        type: string
+      speed:
+        description: Current speed of the rocket
+        type: integer
+      status:
+        description: Current status
+        type: string
+      type:
+        description: Type of rocket
+        type: string
+    type: object
+  domain.RocketMessage:
+    properties:
+      message: {}
+      metadata:
+        $ref: '#/definitions/domain.MessageMetadata'
+    type: object
+host: localhost:8088
+info:
+  contact: {}
+  description: API for managing lunar rockets and their messages
+  title: Lunar Rockets API
+  version: "1.0"
+paths:
+  /messages:
+    post:
+      consumes:
+      - application/json
+      description: Process and store a new rocket message
+      parameters:
+      - description: Message to be processed
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/domain.RocketMessage'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Message accepted
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "405":
+          description: Method not allowed
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Receive a message
+      tags:
+      - messages
+  /rockets:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all available rockets with optional sorting
+      parameters:
+      - description: Sort field ('channel','type','speed','mission','status')
+        in: query
+        name: sort
+        type: string
+      - description: Sort order ('asc' or 'desc')
+        in: query
+        name: order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Rocket'
+            type: array
+      summary: List all rockets
+      tags:
+      - rockets
+  /rockets/{channel}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve details of a specific rocket by its channel ID
+      parameters:
+      - description: Rocket Channel ID
+        in: path
+        name: channel
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Rocket'
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "404":
+          description: Rocket not found
+          schema:
+            type: string
+      summary: Get a specific rocket
+      tags:
+      - rockets
+schemes:
+- http
+swagger: "2.0"
