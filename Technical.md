@@ -63,7 +63,7 @@ graph TD
     B --> C[Message Broker]
     C --> D[RocketService]
     
-    subgraph "Microservice"
+    subgraph "Microservice 1"
         B
     end
     
@@ -71,7 +71,7 @@ graph TD
         C
     end
     
-    subgraph "Microservice"
+    subgraph "Microservice 2"
         D
     end
     
